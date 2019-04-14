@@ -8,6 +8,18 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+```{r}
+packages <- c("dplyr", "ggplot2", "lubridate", "stringr", "foreign")
+load.packages <- function(x) {
+  if (!require(x, character.only = TRUE)) {
+    # character.only = TRUE specifies that the argument being passed to the function is in character type
+    install.packages(x, dependencies = TRUE)
+    # setting dependencies to TRUE will also install other packages that are necessary
+    library(x, character.only = TRUE) # load the package once it has been installed
+  }
+}
+lapply(packages, load.packages)
+```
 
 ## Problem 1
 (a) A vector with the numbers 1–5 in order
@@ -100,6 +112,118 @@ NaNs produced because some of the rows for annual incomes are NaNs.
 ```{r}
 pums$GRAD.DUMMY <- ifelse(pums$SCHL >= 18, "grad","not grad")
 ```
+(f)
+```{r}
+df = subset(pums, select = -c(SERIALNO))
+```
+(g)
+```{r}
+write.csv(df, file = 'newdata.csv')
+```
+(h)
+```{r}
+under16 = pums[is.na(pums$ESR) == TRUE,]
+pums_drop = pums[is.na(pums$ESR) == FALSE,]
+employed = pums_drop[pums_drop$ESR == 1 | pums_drop$ESR == 2 , ]
+unemployed = pums_drop[pums_drop$ESR == 3,]
+armforce = pums_drop[pums_drop$ESR == 4 | pums_drop$ESR == 5 ,]
+notinl = pums_drop[pums_drop$ESR == 6,]
+
+```
+Note that the "employed" category excludes the employed in armed forces. In words, "employed" dataframe only includes civilian employed. 
+<br>
+(i)
+```{r}
+new_frame = pums_drop[pums_drop$ESR == 1 | pums_drop$ESR == 2 | pums_drop$ESR == 4 | pums_drop$ESR == 5, ]
+```
+(j)
+```{r}
+library(dplyr)
+employed_af = select(pums, c(AGEP, RAC1P, PINCP_LOG))
+```
+(k)-(i) First dropped all entries containing "NA".
+```{r}
+travelt = pums[is.na(pums$JWMNP) == FALSE,]$JWMNP
+mean(travelt)
+quantile(travelt, c(0.5, 0.8))
 
 
+```
+(k)-(ii)
+```{r}
+cor(pums$JWMNP, pums$WAGP, use = "complete.obs")
+```
+(k)-(iii) (iv)Scatterplot of age and log income
+```{r}
+pdf("graph for hw0.pdf")
+plot(x=pums$AGEP, y=pums$PINCP_LOG)
+dev.off()
+```
+(k)-(v) crosstab of ESR by race RAC1P
+```{r}
+cst <- table(pums$ESR, pums$RAC1P)
+cst
+```
+
+(k)-(vi) Lienar regression of WAGP on WKHP
+```{r}
+lm1 <- lm(WAGP ~ WKHP, data = pums_drop)
+summary(lm1)
+```
+
+(k)-(vii) Plot residuals from this regression against the fitted values
+```{r}
+plot(lm1$fitted.values,lm1$residuals)
+```
+The residual plot shows that there exists a linear relationship between residuals and fitted values. 
+
+(l)-(i) A linear regression of miles per gallon (mpg) on weight (wt)
+```{r}
+mc <- mtcars
+colnames(mtcars)
+lm2 <- lm(mtcars$mpg~mtcars$wt)
+summary(lm2)
+```
+(l)-(ii) First run the regression of mpg on wt for automatic transition cars. 
+```{r}
+at <- mtcars[mtcars$am == 0,]
+m <- mtcars[mtcars$am == 1,]
+lm3 <- lm(at$mpg~at$wt)
+summary(lm3)
+```
+Then, run the regression of mpg on wt for manual cars.
+```{r}
+lm4 <- lm(m$mpg~m$wt)
+summary(lm4)
+```
+
+(l)-(iii)
+```{r}
+lm5 <- lm(mtcars$mpg ~ log(mtcars$hp))
+summary(lm5)
+```
+(m)-(i)
+```{r}
+mi <- ggplot(mtcars, aes(x=mpg, y=wt)) + geom_point()
+show(mi)
+```
+
+(m)-(ii)
+```{r}
+ggplot(mtcars, aes(mpg, wt, color = am)) + geom_point()
+```
+
+(m)-(iii)
+```{r}
+ggplot(mtcars, aes(mpg, wt, color = am, size = gear)) + geom_point()
+```
+
+(m)-(iv)
+```{r}
+ggplot(mtcars, aes(mpg, wt, color = am, size = gear)) + geom_point() + labs(x = "Miles per gallon", y = "Weight")
+```
+(m) - (v)
+```{r}
+ggplot(mtcars, aes(mpg, wt, color = am, size = gear)) + geom_point() + labs(x = "Miles per gallon", y = "Weight") + theme(panel.background = element_rect(fill = "lightyellow"))
+```
 
