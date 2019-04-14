@@ -1,3 +1,6 @@
+setwd("~/Documents/GitHub/MMSS-311-2")
+pums <- read.csv("pums_chicago.csv")
+
 v <- c(1:5)
 Mindy <- 12
 byrow <- matrix(1:6, nrow = 2, ncol = 3, byrow = TRUE)
@@ -17,9 +20,7 @@ YON <- function(n){
 }
 g <- rnorm(1000, mean = 10, sd = 1)
 y <- rnorm(1000, mean = 5, sd = 0.5)
-x <- v[0]
-for (val in c(1:1000)){
-  append(x, mean(sample(g, 10, replace = TRUE))) 
-  val = val+1
+x <- NULL
+for (i in 1:1000){
+  x[i] <- mean(sample(g, 10, replace = TRUE))
 }
-a <- mean(sample(g, 10, replace = TRUE))

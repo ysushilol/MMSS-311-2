@@ -1,0 +1,105 @@
+---
+title: "MMSS 311-2 HW0"
+author: "Yushi Liu"
+date: "4/12/2019"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Problem 1
+(a) A vector with the numbers 1–5 in order
+
+```{r}
+v <- c(1:5)
+v
+```
+(b) A scalar named Mindy that takes the value 12
+```{r}
+Mindy <- 12
+Mindy
+```
+(c) A 2 × 3 matrix with the numbers 1–6 in order by rows
+```{r}
+byrow <- matrix(1:6, nrow = 2, ncol = 3, byrow = TRUE)
+byrow
+```
+(d)
+```{r}
+bycol <- matrix(1:6, nrow = 2, ncol = 3)
+bycol
+```
+(e)
+```{r}
+ones <- matrix(1, nrow = 10, ncol = 10)
+```
+(f)
+```{r}
+str <- c("THIS", "IS", "A", "VECTOR")
+
+```
+(g)
+```{r}
+sum3 <- function(a, b, c){
+  return(a+b+c)
+  print(a+b+c)
+}
+```
+(h)
+```{r}
+YON <- function(n){
+  if(n <= 10){
+    return('Yes')
+  }
+  return('No')
+}
+```
+(i)
+```{r}
+g <- rnorm(1000, mean = 10, sd = 1)
+
+```
+(j)
+```{r}
+y <- rnorm(1000, mean = 5, sd = 0.5)
+
+```
+(k) 
+```{r}
+x <- NULL
+for (i in 1:1000){
+  x[i] <- mean(sample(g, 10, replace = TRUE))
+}
+```
+(j)
+```{r}
+lm <- lm(y ~ x)
+summary(lm)
+```
+The coefficient is 0.03 but the p-value is not less than 0.05, so y doesn't have a significant increasing trend against x. 
+
+## Problem 2
+```{r}
+setwd("~/Documents/GitHub/MMSS-311-2")
+pums <- read.csv("pums_chicago.csv")
+dim(pums)
+```
+(b) There are 204 variables and 50000 observations.
+(c) See below
+```{r}
+annual_income <- mean(pums$PINCP, na.rm = TRUE)
+```
+(d)
+```{r}
+pums$PINCP_LOG <- log(pums$PINCP)
+```
+NaNs produced because some of the rows for annual incomes are NaNs. 
+(e)
+```{r}
+pums$GRAD.DUMMY <- ifelse(pums$SCHL >= 18, "grad","not grad")
+```
+
+
+
