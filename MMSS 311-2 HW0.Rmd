@@ -175,7 +175,7 @@ summary(lm1)
 ```{r}
 plot(lm1$fitted.values,lm1$residuals)
 ```
-The residual plot shows that there exists a linear relationship between residuals and fitted values. 
+The residual plot shows that there exists a linear relationship between residuals and fitted values. The distribution of residuals are not random, so there might exist omitted variable bias in this model. 
 
 (l)-(i) A linear regression of miles per gallon (mpg) on weight (wt)
 ```{r}
