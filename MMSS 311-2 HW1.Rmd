@@ -1,0 +1,27 @@
+---
+title: "MMSS 311-2 HW1"
+author: "Yushi Liu"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+
+```
+
+## Regression
+
+```{r cars}
+summary(cars)
+```
+
+## Regularization/Selection
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+## Classification
