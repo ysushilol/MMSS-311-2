@@ -7,21 +7,68 @@ output: pdf_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+# Regression 
+## OLS
 ```{r}
-
+library(dplyr)
+library(ggplot2)
+sick <- read.csv("sick_data.csv") 
+sick$dummy <- ifelse(sick$result == "Positive", 1, 0)
+lm1 <- lm(dummy~bp+temp, data=sick)
+summary(lm1)
+sick$predicted <- ifelse (fitted(lm1) < 0.5, "Negative", "Positive")
+sick$count <- ifelse (sick$result == sick$predicted, 1, 0)
+sum(sick$count)/1000
 ```
 
-## Regression
+## Logit
+```{r}
+lm2 <- glm(dummy~bp+temp, data=sick, family = "binomial")
+summary(lm2)
+sick$predicted_logit <- ifelse (fitted(lm2) < 0.5, "Negative", "Positive")
+sick$count_logit <- ifelse (sick$result == sick$predicted_logit, 1, 0)
+sum(sick$count_logit)/1000
+c <- (0.5 - coef(lm2)["(Intercept)"])/coef(lm2)["temp"]
+d <- coef(lm2)["bp"]/coef(lm2)["temp"]
 
-```{r cars}
-summary(cars)
+```
+b) The logit regression predicts 99.2% of the cases correctly, while the linear regression predicts 96.4% correctly. Statistically, the logit model predicts more accurately than the the linear regression. 
+c) For the OLS model: 
+$bp = 90.95175  + 0.1319124 \space temp$.
+
+For the logit model:
+$bp = -571.009822 + 6.612235 \space temp$
+
+d) Below is the graph with OLS line:
+```{r}
+a <- (0.5 - coef(lm1)["(Intercept)"])/coef(lm1)["temp"]
+b <- coef(lm1)["bp"]/coef(lm1)["temp"]
+ggplot(sick, aes(x = bp, y= temp))+
+  geom_point(aes(color = factor(sick$result ))) +
+  geom_abline(intercept = a, slope = -b, color = "black")
+```
+Below is the graph with logit line:
+```{r}
+ggplot(sick, aes(x = bp, y= temp))+
+  geom_point(aes(color = factor(sick$result ))) +
+  geom_abline(intercept = c, slope = -d, color = "black")
 ```
 
 ## Regularization/Selection
+a)
+```{r}
+widget <- read.csv("widget_data.csv")
+plot(widget$y, pch=19)
+```
+## Ridge Regression
+b)
+```{r}
+library(glmnet)
+library(tidyverse)
+library(broom)
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+grid = 10^seq(2, -2, length = 100)
+ridge.mod = glmnet()
 ```
 
 ## Classification
