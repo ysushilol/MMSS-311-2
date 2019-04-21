@@ -97,11 +97,44 @@ bestlam1 = cv.out1$lambda.min
 bestlam1
 ```
 The best lambda for the lasso regression is 0.2092358. 
-The lasso regression gives a smaller lambda than ridge regression does. This may imply that 
-## Classification
+The lasso regression gives a smaller lambda than ridge regression does. Lasso regression and ridge regression give different optimal lambdas because they impose different rules of deciding penalties. 
+# Classification
 ```{r}
 library(e1071)
+pol_data = read.csv("pol_data.csv")
+# Split the data
+pol_data["ID"] <- rownames(pol_data)
+pol_data$dummy <- ifelse(pol_data$group == "Socialcrat", 1, 0)
+set.seed(20)
+test <- pol_data[sample(nrow(pol_data), 100), ]
+train <- pol_data[!(pol_data$ID %in% test$ID),]
+```
+## Naive Bayes
+```{r}
+naiveBayes(train$dummy ~ train$pol_margin+train$col_degree+train$house_income, train, na.action = na.pass)
+NB.prediction <- predict()
+```
+##SVM
+```{r}
+dat <- data.frame(x = train[,2:4], y = as.factor(train$dummy))
+svmfit <- svm(y~., data=dat, kernel="linear", cost=10,
+scale=FALSE)
+summary(svmfit)
 
+#SVM tune out
+set.seed(250)
+tune.out = tune(svm, train$dummy ~ train$pol_margin+train$col_degree+train$house_income, data = dat, kernel = "linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
+summary(tune.out)
+bestmod = tune.out$best.model
+summary(bestmod)
+
+#make prediction using the best model
+#testdat = data.frame(x = test[2:4], y = as.factor(test$dummy))
+testdat=data.frame(x=test[2:4])
+bsvm = svm(train$group~train$pol_margin+train$col_degree+train$house_income, data = train, kernel = "linear", cost = 0.1, scale = FALSE)
+ypred <- predict(bestmod, as.matrix(testdat))
+
+table(predict = ypred, truth = testdat$y)
 ```
 
 
