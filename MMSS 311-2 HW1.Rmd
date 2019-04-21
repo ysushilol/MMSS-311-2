@@ -111,28 +111,30 @@ train <- pol_data[!(pol_data$ID %in% test$ID),]
 ```
 ## Naive Bayes
 ```{r}
-naiveBayes(train$dummy ~ train$pol_margin+train$col_degree+train$house_income, train, na.action = na.pass)
-NB.prediction <- predict()
+dat <- data.frame(x = train[,2:4], y = as.factor(train$dummy))
+nb <- naiveBayes(y ~ ., data = dat, na.action = na.pass)
+testdat <- data.frame(x=test[2:4], y = as.factor(test$dummy))
+NB.prediction <- predict(nb, testdat)
+table(predict = NB.prediction, truth = testdat$y)
+
 ```
 ##SVM
 ```{r}
-dat <- data.frame(x = train[,2:4], y = as.factor(train$dummy))
 svmfit <- svm(y~., data=dat, kernel="linear", cost=10,
 scale=FALSE)
 summary(svmfit)
 
 #SVM tune out
 set.seed(250)
-tune.out = tune(svm, train$dummy ~ train$pol_margin+train$col_degree+train$house_income, data = dat, kernel = "linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
+tune.out = tune(svm, y~., data = dat, kernel = "linear",ranges=list(cost=c(0.001, 0.01, 0.1, 1,5,10,100)))
 summary(tune.out)
 bestmod = tune.out$best.model
 summary(bestmod)
 
 #make prediction using the best model
 #testdat = data.frame(x = test[2:4], y = as.factor(test$dummy))
-testdat=data.frame(x=test[2:4])
 bsvm = svm(train$group~train$pol_margin+train$col_degree+train$house_income, data = train, kernel = "linear", cost = 0.1, scale = FALSE)
-ypred <- predict(bestmod, as.matrix(testdat))
+ypred <- predict(bestmod, testdat)
 
 table(predict = ypred, truth = testdat$y)
 ```
