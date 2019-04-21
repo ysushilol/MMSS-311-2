@@ -54,7 +54,7 @@ ggplot(sick, aes(x = bp, y= temp))+
   geom_abline(intercept = c, slope = -d, color = "black")
 ```
 
-## Regularization/Selection
+# Regularization/Selection
 a)
 ```{r}
 widget <- read.csv("widget_data.csv")
@@ -68,7 +68,41 @@ library(tidyverse)
 library(broom)
 
 grid = 10^seq(2, -2, length = 100)
-ridge.mod = glmnet()
+ridge.mod = glmnet(x = as.matrix(widget[,2:31]), y = as.matrix(widget[1]), alpha = 0, lambda=grid) %>% broom::tidy()
+
+#Plot Ridge
+ridge.plot = ggplot(data.frame(ridge.mod), aes(x = ridge.mod$lambda, y = ridge.mod$estimate)) + geom_point()
+
+#CV Ridge
+set.seed(1)
+cv.out = cv.glmnet(x = as.matrix(widget[,2:31]), y = as.matrix(widget[1]), alpha = 0)
+plot(cv.out)
+bestlam = cv.out$lambda.min
+bestlam
+```
+The best lambda is 0.3410022. 
+
+## Lasso
+```{r}
+lasso.mod = glmnet(x = as.matrix(widget[, 2:31]), y = as.matrix(widget[1]), alpha = 1, lambda=grid) %>% broom::tidy()
+
+#Plot lasso
+lasso.plot = ggplot(data.frame(lasso.mod), aes(x = lasso.mod$lambda, y = lasso.mod$estimate)) + geom_point()
+
+#CV lasso
+set.seed(2)
+cv.out1 = cv.glmnet(x = as.matrix(widget[,2:31]), y = as.matrix(widget[1]), alpha = 1)
+plot(cv.out1)
+bestlam1 = cv.out1$lambda.min
+bestlam1
+```
+The best lambda for the lasso regression is 0.2092358. 
+The lasso regression gives a smaller lambda than ridge regression does. This may imply that 
+## Classification
+```{r}
+library(e1071)
+
 ```
 
-## Classification
+
+
